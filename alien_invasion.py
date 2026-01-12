@@ -3,6 +3,7 @@ import  pygame
 from settings.settings import Settings
 from ship.ship import Ship
 from enemy.enemy_boss import EnemyBoss
+from enemy.alien import Alien
 from bullets.bullets import Bullet
 
 class AlienInvasion:
@@ -23,11 +24,13 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
 
         # Display ship
+        # self.alien = Alien(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
         # Display Enemy
-        self.enemy = EnemyBoss(self, self.ship)
+        # self.enemy = EnemyBoss(self, self.ship)
 
 
     def run_game(self):
@@ -36,7 +39,9 @@ class AlienInvasion:
             # Watch for keyboard and mouse events.
             self._check_events()
             self.ship.update()
-            self.bullets.update()
+
+            # Get rid of bullets that have disappeared.
+            self._update_bullets()
             self._update_screen()
             self.clock.tick(60)
 
@@ -61,6 +66,13 @@ class AlienInvasion:
             self.settings.screen_height = self.screen.get_rect().height
             self.settings.screen_width = self.screen.get_rect().width
 
+    def _update_bullets(self):
+        """Update position of bullets and get rid of old bullets."""
+        self.bullets.update()
+
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
 
     def _check_keyup_events(self,event):
         """Response to key releases."""
@@ -92,8 +104,9 @@ class AlienInvasion:
 
     def _fire_bullets(self):
         """Firing Bullets"""
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
 
     def _update_screen(self):
@@ -105,11 +118,29 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.ship.blitme()
-        self.enemy.blitme()
+        self.aliens.draw(self.screen)
+        # self.enemy.blitme()
+        # self.alien.blitme()
+
     
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
+
+    def _create_fleet(self):
+        """Create fleet of aliens"""
+        # Create an alien and keep adding aliens until there's no room left.
+        # Spacing between aliens is one alien width.
+        alien = Alien(self)
+        alien_width = alien.rect.width
+
+        current_x = alien_width
+        while current_x < (self.settings.screen_width - 2 * alien_width):
+            new_alien = Alien(self)
+            new_alien.x  = current_x
+            new_alien.rect.x = current_x
+            self.aliens.add(new_alien)
+            current_x += 2 * alien_width
 
 if __name__ == '__main__':
     # Make a game instance, and run the game.
