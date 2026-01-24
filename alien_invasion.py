@@ -45,6 +45,7 @@ class AlienInvasion:
 
         self.title_font = pygame.font.SysFont(None, 64)   # title
         self.desc_font = pygame.font.SysFont(None, 32)    # desc
+        self.life_font = pygame.font.SysFont(None, 16)   # title
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -63,16 +64,17 @@ class AlienInvasion:
                 self.aliens.empty()
                 self._game_over()
                 self.update_screen_count += 1
+                self.settings.ship_life -= 1
             
             if self.update_screen_count < 2:
                 self._update_screen()
     
     def _ship_hit(self):
         """Ship being hit by the alien"""
-        print(f"ship_left:{self.stats.ship_left}")
         if self.stats.ship_left > 0:       
             # Decrement ships left.
             self.stats.ship_left -= 1
+            self.settings.ship_life -= 1
 
             # Get rid of any remaining bullets and aliens.
             self.bullets.empty()
@@ -81,11 +83,26 @@ class AlienInvasion:
             # Create a new fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
-
+            self._ship_life()
             # Pause.
             sleep(0.5)
         else:
             self.game_active = False
+
+
+    def _ship_life(self): 
+        """Display Ship life line"""
+        text_ship_life = self.life_font.render(f"Life: {self.settings.ship_life}", True, (0, 0, 0))
+
+        # Position text at top-right
+        text_ship_life_rect = text_ship_life.get_rect(
+            topright=(
+                self.screen.get_rect().right - 20,  # 20 px margin from right
+                20                                   # 20 px from top
+            )
+        )
+
+        self.screen.blit(text_ship_life, text_ship_life_rect)
 
     def _check_events(self):
         """Response to keypress and mouse event."""
@@ -184,11 +201,13 @@ class AlienInvasion:
         self.aliens.draw(self.screen)
         # self.enemy.blitme()
         # self.alien.blitme()
+        self._ship_life()
 
     
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
+    
 
     def _create_fleet(self):
         """Create fleet of aliens"""
