@@ -7,6 +7,7 @@ from enemy.alien import Alien
 from bullets.bullets import Bullet
 from time import sleep
 from stats.game_stats import GameStats
+from components.button import Button
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour."""
@@ -15,11 +16,7 @@ class AlienInvasion:
         """Initialize the game, and create game resources."""
         pygame.init()
 
-        # Start Alien Invasion in an active state.
-        self.game_active = True
-
         # Update screen count to stop updating the screen once the game is over
-        self.update_screen_count = 0
 
         self.clock = pygame.time.Clock()
         self.settings = Settings()
@@ -28,7 +25,7 @@ class AlienInvasion:
             (self.settings.screen_width, self.settings.screen_height)
         )
 
-        #self.screen = pygame.display.set_mode((1200,800))
+        self.screen = pygame.display.set_mode((1200,800))
         pygame.display.set_caption("Alien Invasion")
 
         # Create instace for Game Stats
@@ -42,6 +39,13 @@ class AlienInvasion:
         self._create_fleet()
         # Display Enemy
         # self.enemy = EnemyBoss(self, self.ship)
+
+
+        # Start Alien Invasion in an active state.
+        self.game_active = False
+
+        # Play Button
+        self.play_button = Button(self, "Play")
 
         self.title_font = pygame.font.SysFont(None, 64)   # title
         self.desc_font = pygame.font.SysFont(None, 32)    # desc
@@ -59,23 +63,23 @@ class AlienInvasion:
                 self._update_bullets()
                 self._update_aliens()
                 self.clock.tick(60)
-            else:
-                self.bullets.empty()
-                self.aliens.empty()
-                self._game_over()
-                self.update_screen_count += 1
-                self.settings.ship_life -= 1
+            # else:
+            #     self.bullets.empty()
+            #     self.aliens.empty()
+            #     self._game_over()
+            #     self.update_screen_count += 1
+            #     self.settings.ship_life -= 1
             
-            if self.update_screen_count < 2:
+            if not self.settings.is_game_over:
                 self._update_screen()
     
     def _ship_hit(self):
         """Ship being hit by the alien"""
-        if self.stats.ship_left > 0:       
+        print("ship hit")
+        if self.stats.ship_left > 0:    
             # Decrement ships left.
             self.stats.ship_left -= 1
-            self.settings.ship_life -= 1
-
+            self.stats.ship_life -= 1
             # Get rid of any remaining bullets and aliens.
             self.bullets.empty()
             self.aliens.empty()
@@ -87,12 +91,18 @@ class AlienInvasion:
             # Pause.
             sleep(0.5)
         else:
+            #pygame.mouse.set_visible(True)
+            self._game_over()
             self.game_active = False
+            self.bullets.empty()
+            self.aliens.empty()
+            self.stats.ship_life -= 1
+            self.settings.is_game_over = True
 
 
     def _ship_life(self): 
         """Display Ship life line"""
-        text_ship_life = self.life_font.render(f"Life: {self.settings.ship_life}", True, (0, 0, 0))
+        text_ship_life = self.life_font.render(f"Life: {self.stats.ship_life}", True, (0, 0, 0))
 
         # Position text at top-right
         text_ship_life_rect = text_ship_life.get_rect(
@@ -113,6 +123,29 @@ class AlienInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """Response Upon click Play Button"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active and not self.settings.is_game_over:
+            # Reset the game
+            self.stats.reset_stats()
+            self.game_active = True
+
+            # Get rid of bullets and aliens
+            self.bullets.empty()
+            self.aliens.empty()
+
+            # Create new fleet
+            self._create_fleet()
+            self.ship.center_ship()
+
+            # Hide mouse cursor
+            pygame.mouse.set_visible(False)
+
 
     def _full_screen_events(self, event):
         """handle the fullscreen"""
@@ -177,10 +210,30 @@ class AlienInvasion:
             self.ship.moving_bottom = True
         elif event.key == pygame.K_SPACE:
             self._fire_bullets()
+        elif event.key == pygame.K_r:
+            self._restart_game()
         elif event.key == pygame.K_q:
             sys.exit()
         else:
             self._full_screen_events(event)
+
+    def _restart_game(self):
+        """Restart the game"""
+        print("_restart_game")
+        self.settings.is_game_over = False
+
+        # Reset the game
+        self.stats.reset_stats()
+        self.game_active = True
+
+        # Get rid of bullets and aliens
+        self.bullets.empty()
+        self.aliens.empty()
+
+        # Create new fleet
+        self._create_fleet()
+        self.ship.center_ship()
+    
 
     def _fire_bullets(self):
         """Firing Bullets"""
@@ -203,7 +256,9 @@ class AlienInvasion:
         # self.alien.blitme()
         self._ship_life()
 
-    
+        # Draw the play button
+        if not self.game_active and not self.settings.is_game_over:
+            self.play_button.draw_button()
 
         # Make the most recently drawn screen visible.
         pygame.display.flip()
@@ -268,7 +323,7 @@ class AlienInvasion:
         text_title_rect = text_title.get_rect(center=(self.screen.get_rect().centerx, self.screen.get_rect().centery - 30) )
         self.screen.blit(text_title, text_title_rect)
 
-        text_desc = self.desc_font.render("Press 'Q' to exit the game", True, (0, 0, 0))
+        text_desc = self.desc_font.render("Press 'R' to Restart the Game", True, (0, 0, 0))
         text_desc_rect = text_desc.get_rect(center=(self.screen.get_rect().centerx, self.screen.get_rect().centery + 25))
         self.screen.blit(text_desc, text_desc_rect)
 
