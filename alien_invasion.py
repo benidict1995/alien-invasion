@@ -146,6 +146,9 @@ class AlienInvasion:
             # Hide mouse cursor
             pygame.mouse.set_visible(False)
 
+            # Reset game settings
+            self.settings.Initialize_dynamic_settings()
+
 
     def _full_screen_events(self, event):
         """handle the fullscreen"""
@@ -185,6 +188,7 @@ class AlienInvasion:
             # Destroy existing bullets and creat new fleet.
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
 
     def _check_keyup_events(self,event):
