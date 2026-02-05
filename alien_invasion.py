@@ -2,12 +2,15 @@ import sys
 import  pygame
 from settings.settings import Settings
 from ship.ship import Ship
+from enemy.boss import Boss
+from enemy.suneyo import Suneyo
 from enemy.enemy_boss import EnemyBoss
 from enemy.alien import Alien
 from bullets.bullets import Bullet
 from time import sleep
 from stats.game_stats import GameStats
 from components.button import Button
+from stats.scoreboard import Scoreboard
 
 class AlienInvasion:
     """Overall class to manage game assets and behaviour."""
@@ -30,6 +33,7 @@ class AlienInvasion:
 
         # Create instace for Game Stats
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         # Display ship
         # self.alien = Alien(self)
@@ -39,6 +43,9 @@ class AlienInvasion:
         self._create_fleet()
         # Display Enemy
         # self.enemy = EnemyBoss(self, self.ship)
+        
+        # Suneyo
+        self.suneyo = Suneyo(self, self.ship)
 
 
         # Start Alien Invasion in an active state.
@@ -149,6 +156,8 @@ class AlienInvasion:
             # Reset game settings
             self.settings.Initialize_dynamic_settings()
 
+            self.sb.prep_score()
+
 
     def _full_screen_events(self, event):
         """handle the fullscreen"""
@@ -184,6 +193,13 @@ class AlienInvasion:
         # Check for any bullets that have hit aliens.
         # If so, get rid of the bullet and the alien.
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points + len(aliens)
+            self.stats.score += self.settings.alien_points
+            self.sb.prep_score()
+
         if not self.aliens:
             # Destroy existing bullets and creat new fleet.
             self.bullets.empty()
@@ -256,6 +272,8 @@ class AlienInvasion:
 
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        self.sb.show_score() 
         # self.enemy.blitme()
         # self.alien.blitme()
         self._ship_life()

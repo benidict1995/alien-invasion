@@ -12,3 +12,4 @@ class GameStats:
         """Reset statistics"""
         self.ship_left = self.settings.ship_limit
         self.ship_life = 2
+        self.score = 0
