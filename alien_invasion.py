@@ -2,8 +2,6 @@ import sys
 import  pygame
 from settings.settings import Settings
 from ship.ship import Ship
-from enemy.boss import Boss
-from enemy.suneyo import Suneyo
 from enemy.enemy_boss import EnemyBoss
 from enemy.alien import Alien
 from bullets.bullets import Bullet
@@ -40,12 +38,12 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+
+    
         self._create_fleet()
         # Display Enemy
         # self.enemy = EnemyBoss(self, self.ship)
-        
-        # Suneyo
-        self.suneyo = Suneyo(self, self.ship)
+    
 
 
         # Start Alien Invasion in an active state.
