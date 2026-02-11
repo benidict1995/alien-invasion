@@ -54,7 +54,7 @@ class AlienInvasion:
 
         self.title_font = pygame.font.SysFont(None, 64)   # title
         self.desc_font = pygame.font.SysFont(None, 32)    # desc
-        self.life_font = pygame.font.SysFont(None, 16)   # title
+        self.life_font = pygame.font.SysFont(None, 28)   # title
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -88,11 +88,13 @@ class AlienInvasion:
             # Get rid of any remaining bullets and aliens.
             self.bullets.empty()
             self.aliens.empty()
+            self.stats.score = 0
 
             # Create a new fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
             self._ship_life()
+            self.sb.prep_score()
             # Pause.
             sleep(0.5)
         else:
@@ -102,6 +104,7 @@ class AlienInvasion:
             self.bullets.empty()
             self.aliens.empty()
             self.stats.ship_life -= 1
+            self.stats.score = 0
             self.settings.is_game_over = True
 
 
@@ -155,6 +158,7 @@ class AlienInvasion:
             self.settings.Initialize_dynamic_settings()
 
             self.sb.prep_score()
+            self.sb.prep_high_score()
 
 
     def _full_screen_events(self, event):
@@ -197,6 +201,7 @@ class AlienInvasion:
                 self.stats.score += self.settings.alien_points + len(aliens)
             self.stats.score += self.settings.alien_points
             self.sb.prep_score()
+            self.sb.check_high_score()
 
         if not self.aliens:
             # Destroy existing bullets and creat new fleet.
@@ -251,6 +256,9 @@ class AlienInvasion:
         # Create new fleet
         self._create_fleet()
         self.ship.center_ship()
+
+        self.sb.prep_score()
+
     
 
     def _fire_bullets(self):
