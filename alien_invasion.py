@@ -159,6 +159,7 @@ class AlienInvasion:
 
             self.sb.prep_score()
             self.sb.prep_high_score()
+            self.sb.prep_level()
 
 
     def _full_screen_events(self, event):
@@ -203,11 +204,15 @@ class AlienInvasion:
             self.sb.prep_score()
             self.sb.check_high_score()
 
+
         if not self.aliens:
             # Destroy existing bullets and creat new fleet.
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+
+            self.stats.level += 1
+            self.sb.prep_level()
 
 
     def _check_keyup_events(self,event):
@@ -258,6 +263,7 @@ class AlienInvasion:
         self.ship.center_ship()
 
         self.sb.prep_score()
+        self.sb.prep_level()
 
     
 
