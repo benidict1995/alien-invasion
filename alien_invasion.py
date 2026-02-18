@@ -54,7 +54,7 @@ class AlienInvasion:
 
         self.title_font = pygame.font.SysFont(None, 64)   # title
         self.desc_font = pygame.font.SysFont(None, 32)    # desc
-        self.life_font = pygame.font.SysFont(None, 28)   # title
+        self.life_font = pygame.font.SysFont(None, 18)   # title
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -107,20 +107,38 @@ class AlienInvasion:
             self.stats.score = 0
             self.settings.is_game_over = True
 
-
     def _ship_life(self): 
         """Display Ship life line"""
         text_ship_life = self.life_font.render(f"Life: {self.stats.ship_life}", True, (0, 0, 0))
 
         # Position text at top-right
-        text_ship_life_rect = text_ship_life.get_rect(
+        self.text_ship_life_rect = text_ship_life.get_rect(
             topright=(
                 self.screen.get_rect().right - 20,  # 20 px margin from right
                 20                                   # 20 px from top
             )
         )
 
-        self.screen.blit(text_ship_life, text_ship_life_rect)
+        self.screen.blit(text_ship_life, self.text_ship_life_rect)
+
+    def prep_level(self):
+        """Display level"""
+        level_str = str(self.stats.level)
+        self.level_image = self.life_font.render(
+            f"Level: {level_str}",
+            True,
+            (0, 0, 0),
+            self.settings.bg_color
+        )
+
+        self.level_rect = self.level_image.get_rect()
+
+        # Align right with ship life
+        self.level_rect.right = self.text_ship_life_rect.right
+        self.level_rect.top = self.text_ship_life_rect.bottom + 10
+
+        self.screen.blit(self.level_image, self.level_rect)
+
 
     def _check_events(self):
         """Response to keypress and mouse event."""
@@ -159,7 +177,7 @@ class AlienInvasion:
 
             self.sb.prep_score()
             self.sb.prep_high_score()
-            self.sb.prep_level()
+            self.prep_level()
 
 
     def _full_screen_events(self, event):
@@ -212,7 +230,7 @@ class AlienInvasion:
             self.settings.increase_speed()
 
             self.stats.level += 1
-            self.sb.prep_level()
+            self.prep_level()
 
 
     def _check_keyup_events(self,event):
@@ -263,7 +281,7 @@ class AlienInvasion:
         self.ship.center_ship()
 
         self.sb.prep_score()
-        self.sb.prep_level()
+        self.prep_level()
 
     
 
@@ -289,6 +307,7 @@ class AlienInvasion:
         # self.enemy.blitme()
         # self.alien.blitme()
         self._ship_life()
+        self.prep_level()
 
         # Draw the play button
         if not self.game_active and not self.settings.is_game_over:
