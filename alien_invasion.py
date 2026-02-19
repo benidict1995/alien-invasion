@@ -263,6 +263,7 @@ class AlienInvasion:
         elif event.key == pygame.K_r:
             self._restart_game()
         elif event.key == pygame.K_q:
+            self.sb.save_high_score()
             sys.exit()
         else:
             self._full_screen_events(event)

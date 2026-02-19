@@ -1,6 +1,8 @@
 import pygame.font
 from pygame.sprite import Group
 from ship.ship import Ship
+import json
+from pathlib import Path
 
 class Scoreboard:
     """A class to report scoring information."""
@@ -21,6 +23,7 @@ class Scoreboard:
         self.prep_score()
         self.prep_high_score()
         self.prep_ships()
+        self.load_high_score()
         #self.prep_level()
 
     def prep_ships(self):
@@ -64,3 +67,28 @@ class Scoreboard:
         self.high_score_rect = self.high_score_image.get_rect()
         self.high_score_rect.centerx = self.screen_rect.centerx
         self.high_score_rect.top = 20
+
+    def load_high_score(self):
+        """Load high score from the path file"""
+        path = Path("file/high_score.json")
+        # Make sure folder exists
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            if path.exists():
+                contents = path.read_text()
+                self.stats.high_score = int(json.loads(contents))
+            else:
+                self.stats.high_score = 0
+        except FileNotFoundError:
+            self.stats.high_score = 0
+
+
+    def save_high_score(self):
+        """Save high score to the path file"""
+        path = Path("file/high_score.json")
+        # Make sure folder exists
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        contents = json.dumps(self.stats.high_score)
+        path.write_text(contents)
