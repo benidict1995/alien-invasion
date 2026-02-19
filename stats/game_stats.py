@@ -11,7 +11,7 @@ class GameStats:
 
     def reset_stats(self):
         """Reset statistics"""
-        self.ship_left = self.settings.ship_limit
-        self.ship_life = 2
+        self.ship_left = 3
+        self.ship_life = 3
         self.score = 0
         self.level = 1

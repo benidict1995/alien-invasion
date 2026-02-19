@@ -93,8 +93,9 @@ class AlienInvasion:
             # Create a new fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
-            self._ship_life()
+            # self._ship_life()
             self.sb.prep_score()
+            self.sb.prep_ships()
             # Pause.
             sleep(0.5)
         else:
@@ -107,19 +108,19 @@ class AlienInvasion:
             self.stats.score = 0
             self.settings.is_game_over = True
 
-    def _ship_life(self): 
-        """Display Ship life line"""
-        text_ship_life = self.life_font.render(f"Life: {self.stats.ship_life}", True, (0, 0, 0))
+    # def _ship_life(self): 
+    #     """Display Ship life line"""
+    #     text_ship_life = self.life_font.render(f"Life: {self.stats.ship_life}", True, (0, 0, 0))
 
-        # Position text at top-right
-        self.text_ship_life_rect = text_ship_life.get_rect(
-            topright=(
-                self.screen.get_rect().right - 20,  # 20 px margin from right
-                20                                   # 20 px from top
-            )
-        )
+    #     # Position text at top-right
+    #     self.text_ship_life_rect = text_ship_life.get_rect(
+    #         topright=(
+    #             self.screen.get_rect().right - 20,  # 20 px margin from right
+    #             20                                   # 20 px from top
+    #         )
+    #     )
 
-        self.screen.blit(text_ship_life, self.text_ship_life_rect)
+    #     self.screen.blit(text_ship_life, self.text_ship_life_rect)
 
     def prep_level(self):
         """Display level"""
@@ -134,8 +135,10 @@ class AlienInvasion:
         self.level_rect = self.level_image.get_rect()
 
         # Align right with ship life
-        self.level_rect.right = self.text_ship_life_rect.right
-        self.level_rect.top = self.text_ship_life_rect.bottom + 10
+        # self.level_rect.right = self.text_ship_life_rect.right
+        # self.level_rect.top = self.text_ship_life_rect.bottom + 10
+        self.level_rect.right = self.sb.high_score_rect.right
+        self.level_rect.top = self.sb.high_score_rect.bottom + 10
 
         self.screen.blit(self.level_image, self.level_rect)
 
@@ -178,6 +181,7 @@ class AlienInvasion:
             self.sb.prep_score()
             self.sb.prep_high_score()
             self.prep_level()
+            self.sb.prep_ships()
 
 
     def _full_screen_events(self, event):
@@ -282,6 +286,7 @@ class AlienInvasion:
 
         self.sb.prep_score()
         self.prep_level()
+        self.sb.prep_ships()
 
     
 
@@ -306,7 +311,7 @@ class AlienInvasion:
         self.sb.show_score() 
         # self.enemy.blitme()
         # self.alien.blitme()
-        self._ship_life()
+        # self._ship_life()
         self.prep_level()
 
         # Draw the play button
