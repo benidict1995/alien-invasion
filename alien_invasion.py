@@ -94,7 +94,7 @@ class AlienInvasion:
             self._create_fleet()
             self.ship.center_ship()
             # self._ship_life()
-            self.sb.prep_score()
+            #self.sb.prep_score()
             self.sb.prep_ships()
             # Pause.
             sleep(0.5)
@@ -330,7 +330,7 @@ class AlienInvasion:
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
    
-        current_x, current_y = alien_width, alien_height
+        current_x, current_y = alien_width, alien_height + 40
         while current_y < (self.settings.screen_height - 3 * alien_height):
             while current_x < (self.settings.screen_width - 2 * alien_width):
                 self._create_alien(current_x, current_y)
