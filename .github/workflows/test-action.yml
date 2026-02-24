@@ -1,0 +1,10 @@
+name: Test Workflow
+on: workflow_dispatch
+jobs:
+  first-job:
+    runs-on: macos-latest
+    steps:
+      - name: Print Test Greeting
+        run: echo "Hello World!"
+      - name: Print Test Goodbye
+        run: echo "Done - bye!"
