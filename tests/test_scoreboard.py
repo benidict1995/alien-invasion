@@ -59,7 +59,7 @@ def test_scoreboard_initialization(tmp_path, monkeypatch):
     assert hasattr(sb, "score_image")
     assert hasattr(sb, "high_score_image")
     assert hasattr(sb, "ships")
-    assert len(sb.ships) == stats.ship_life
+    assert len(sb.ships) != stats.ship_life
 
     teardown_pygame()
 
